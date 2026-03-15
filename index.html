@@ -1590,14 +1590,18 @@ function synkMndBelop(kilde) {
   if (!hovedstol) { beregnAvdrag(); return; }
   const mndEl   = document.getElementById('a-mnd');
   const belopEl = document.getElementById('a-mnd-belop');
-  window._avdragsTerminer = null;
   window._sisteAvdragKilde = kilde;
   if (kilde === 'mnd') {
+    // Nullstill terminer kun hvis antall måneder endres
+    const nyMnd = parseInt(mndEl.value) || 0;
+    const gammeltMnd = window._avdragsTerminer?.length || 0;
+    if (nyMnd !== gammeltMnd) window._avdragsTerminer = null;
     belopEl.value = '';
     belopEl.dataset.beregnet = '0';
     mndEl.dataset.beregnet = '0';
     beregnAvdrag();
   } else {
+    // Beløp endret – ikke null terminer, bevar manuelle beløp
     mndEl.value = '';
     mndEl.dataset.beregnet = '0';
     belopEl.dataset.beregnet = '0';
@@ -1762,8 +1766,19 @@ function beregnAvdrag() {
 
   // Splitt: hva som er påløpt nå vs. hva som legges til når tungt salær påløper
   // Hvis tungt ikke har påløpt: start med lett salær, legg til differansen på tungPalopDato
-  const salarNaa       = tungPaloppt ? tungSalar : effektivLettSalar; // påløpt salær per i dag
-  const salarDifferanse = (!tungPaloppt && tungSalar > 0) ? (tungSalar - effektivLettSalar) : 0; // økning når tungt påløper
+  // Splitt: hva som er påløpt nå vs. hva som legges til når lett salær påløper (før BO)
+  const salarDatoStr  = document.getElementById('a-salar-dato')?.value.trim();
+  const salarPalopDato = foerBO && salarDatoStr ? parseNO(salarDatoStr) : null;
+  const lettSalarIkkeEndaPaloppt = salarPalopDato && salarPalopDato > iDag;
+
+  // Hvis lett salær ikke har påløpt ennå (før BO-scenario): start med 0, legg til på salarPalopDato
+  const salarNaa       = tungPaloppt ? tungSalar
+                       : lettSalarIkkeEndaPaloppt ? 0
+                       : effektivLettSalar;
+  const lettSalarDifferanse = lettSalarIkkeEndaPaloppt ? effektivLettSalar : 0;
+  const salarDifferanse = (!tungPaloppt && tungSalar > 0) ? (tungSalar - effektivLettSalar)
+                        : lettSalarIkkeEndaPaloppt ? effektivLettSalar
+                        : 0;
 
   // ── Total renter per i dag ──
   const totalRenterIdag = rentHovedstolIdag + rentSalarIdag + rentTungIdag;
@@ -1872,9 +1887,15 @@ function beregnAvdrag() {
     let sr = rettslige;
     let sRent = totalRenterIdag + rentFremTilForfall;
     let tLagtTil = tungPaloppt;
+    let lLagtTil = !lettSalarIkkeEndaPaloppt;
     let forrige = new Date(startDato);
     for (let i = 1; i <= antMnd; i++) {
       const forf = leggTilMnd(startDato, i - 1);
+      // Legg til lett salær på salarPalopDato
+      if (!lLagtTil && salarPalopDato && forf >= salarPalopDato) {
+        ss += salarDifferanse;
+        lLagtTil = true;
+      }
       // Legg til tungt salær på riktig dato
       if (!tLagtTil && tungPalopDato && forf >= tungPalopDato) {
         ss += salarDifferanse;
@@ -1930,22 +1951,28 @@ function beregnAvdrag() {
     startSaldoSalar: salarNaa + avdragsgebyr,
     startSaldoRettslige: rettslige,
     startSaldoRenter: totalRenterIdag + rentFremTilForfall,
-    forrigeDato: new Date(startDato), // rentene er allerede beregnet frem hit
+    forrigeDato: new Date(startDato),
     fastMndBelop,
     dekning,
     tungPalopDato,
     tungPaloppt,
     salarDifferanse,
+    salarPalopDato,
+    lettSalarIkkeEndaPaloppt,
     mnd,
     manuellRedigering: false,
   };
 
   // Bygg terminer – datoer alltid fra startDato, bevar manuelle beløp hvis antall er uendret
   const gammleTerminer = window._avdragsTerminer;
+  const harManuelle = gammleTerminer?.some(t => t.belop !== null) || false;
+  window._avdragsMeta.manuellRedigering = harManuelle;
+
   window._avdragsTerminer = [];
   for (let i = 0; i < mnd; i++) {
     window._avdragsTerminer.push({
       dato:  leggTilMnd(startDato, i),
+      // Bevar manuelt satte beløp kun hvis antall terminer er uendret
       belop: (gammleTerminer && gammleTerminer.length === mnd) ? gammleTerminer[i].belop : null,
     });
   }
@@ -1956,20 +1983,28 @@ function beregnAvdrag() {
 function beregnAvdragsPlan(terminer, meta) {
   const { startSaldoHovedstol, startSaldoSalar, startSaldoRettslige,
           startSaldoRenter, fastMndBelop, dekning,
-          tungPalopDato, tungPaloppt, salarDifferanse, mnd } = meta;
+          tungPalopDato, tungPaloppt, salarDifferanse,
+          salarPalopDato, lettSalarIkkeEndaPaloppt, mnd } = meta;
 
   let saldoHovedstol = startSaldoHovedstol;
   let saldoSalar     = startSaldoSalar;
   let saldoRettslige = startSaldoRettslige;
   let saldoRenter    = startSaldoRenter;
   let tungLagtTil    = tungPaloppt;
-  let forrigeDato    = new Date(meta.forrigeDato); // startpunkt for renteberegning
+  let lettLagtTil    = !lettSalarIkkeEndaPaloppt; // allerede påløpt hvis ikke forsinket
+  let forrigeDato    = new Date(meta.forrigeDato);
 
   const rader = [];
 
   for (let i = 0; i < terminer.length; i++) {
     const forfallDato = new Date(terminer[i].dato);
     const erSiste = i === terminer.length - 1;
+
+    // Legg til lett salær på salarPalopDato (før BO-scenario)
+    if (!lettLagtTil && salarPalopDato && forfallDato >= salarPalopDato) {
+      saldoSalar  += salarDifferanse;
+      lettLagtTil  = true;
+    }
 
     // Legg til tungt salær på riktig dato
     if (!tungLagtTil && tungPalopDato && forfallDato >= tungPalopDato) {
@@ -1984,11 +2019,18 @@ function beregnAvdragsPlan(terminer, meta) {
 
     const gjenstaar = saldoSalar + saldoRettslige + saldoHovedstol + saldoRenter;
 
-    // Normal: siste termin dekker eksakt gjenstående
-    // Manuell redigering: alle terminer bruker fastMndBelop, ekstra termin dekker rest
-    const betaling = (!meta.manuellRedigering && erSiste)
-      ? Math.round(gjenstaar * 100) / 100
-      : (terminer[i].belop !== null ? terminer[i].belop : fastMndBelop);
+    // Terminbeløp: manuelt satt brukes direkte, ellers fastMndBelop
+    // Siste termin: aldri mer enn fastMndBelop (ekstra termin tar resten)
+    // Unntak: normal beregning uten manuelle beløp og siste termin = eksakt gjenstående
+    const harNoenManuelle = terminer.some(t => t.belop !== null);
+    let betaling;
+    if (terminer[i].belop !== null) {
+      betaling = terminer[i].belop;
+    } else if (!harNoenManuelle && erSiste) {
+      betaling = Math.round(gjenstaar * 100) / 100;
+    } else {
+      betaling = Math.min(fastMndBelop, Math.round(gjenstaar * 100) / 100);
+    }
 
     let rest = betaling;
     let tilSalar = 0, tilHovedstol = 0, tilRenter = 0;
@@ -2019,15 +2061,19 @@ function beregnAvdragsPlan(terminer, meta) {
     forrigeDato = new Date(forfallDato);
   }
 
-  // Legg til ekstra termin kun ved manuell redigering av tabellen
-  const sisteDato = new Date(terminer[terminer.length - 1].dato);
-  const sisteRest = rader[rader.length - 1].restTotal;
-  if (sisteRest > 0.01 && meta.manuellRedigering) {
-    const ekstraDato = leggTilMnd(sisteDato, 1);
+  // Legg til ekstra terminer så lenge det gjenstår noe – aldri overstig fastMndBelop
+  let ekstraIdx = 0;
+  const MAX_EKSTRA = 120;
+  while (rader[rader.length - 1].restTotal > 0.01 && ekstraIdx < MAX_EKSTRA) {
+    ekstraIdx++;
+    const sisteForfall = new Date(rader[rader.length - 1].forfallDato);
+    const ekstraDato = leggTilMnd(sisteForfall, 1);
 
     if (!tungLagtTil && tungPalopDato && ekstraDato >= tungPalopDato) {
-      saldoSalar  += salarDifferanse;
-      tungLagtTil  = true;
+      saldoSalar += salarDifferanse; tungLagtTil = true;
+    }
+    if (!lettLagtTil && salarPalopDato && ekstraDato >= salarPalopDato) {
+      saldoSalar += salarDifferanse; lettLagtTil = true;
     }
 
     const dagerSiden = dagMellom(forrigeDato, ekstraDato);
@@ -2035,13 +2081,13 @@ function beregnAvdragsPlan(terminer, meta) {
     const nyeRenter  = (saldoHovedstol + saldoSalar - saldoRettslige) * dagligSats * dagerSiden;
     saldoRenter     += nyeRenter;
 
-    const gjenstaar = saldoSalar + saldoRettslige + saldoHovedstol + saldoRenter;
-    const betaling  = Math.round(gjenstaar * 100) / 100;
+    const gjenstaar  = saldoSalar + saldoRettslige + saldoHovedstol + saldoRenter;
+    // Cap på fastMndBelop – neste ekstra termin tar resten
+    const betaling   = Math.min(fastMndBelop, Math.round(gjenstaar * 100) / 100);
 
     let rest = betaling;
     let tilSalar = 0, tilHovedstol = 0, tilRenter = 0;
-    const tRettslige2 = Math.min(rest, saldoRettslige);
-    tilSalar += tRettslige2; saldoRettslige -= tRettslige2; rest -= tRettslige2;
+    const tR = Math.min(rest, saldoRettslige); tilSalar += tR; saldoRettslige -= tR; rest -= tR;
     const rek2 = dekning === 'SHR' ? ['S','H','R'] : dekning === 'HSR' ? ['H','S','R'] :
                  dekning === 'RHS' ? ['R','H','S'] : ['R','S','H'];
     for (const p of rek2) {
@@ -2051,12 +2097,19 @@ function beregnAvdragsPlan(terminer, meta) {
       if (p === 'R') { const t = Math.min(rest, saldoRenter);    tilRenter    += t; saldoRenter    -= t; rest -= t; }
     }
 
+    const restTotal     = Math.max(0, saldoSalar + saldoRettslige + saldoHovedstol + saldoRenter);
+    const restSalar     = Math.max(0, saldoSalar + saldoRettslige);
+    const restHovedstol = Math.max(0, saldoHovedstol);
+
     rader.push({
       nr: rader.length + 1, forfallDato: ekstraDato, betaling,
       tilSalar, tilHovedstol, tilRenter,
-      restSalar: 0, restHovedstol: 0, rentePaForfall: saldoRenter + nyeRenter,
-      restTotal: 0, nyeRenter, erSiste: true, ekstraTermin: true,
+      restSalar, restHovedstol,
+      rentePaForfall: saldoRenter + nyeRenter,
+      restTotal, nyeRenter, erSiste: restTotal <= 0.01, ekstraTermin: true,
     });
+
+    forrigeDato = new Date(ekstraDato);
   }
 
   return rader;
@@ -2091,7 +2144,7 @@ function renderAvdragsplan() {
 
     // Merknader
     if (meta.tungPalopDato && !meta.tungPaloppt) {
-      const forrigeF = idx === 0 ? new Date(0) : new Date(terminer[idx - 1].dato);
+      const forrigeF = idx === 0 ? new Date(0) : new Date(rader[idx - 1].forfallDato);
       if (meta.tungPalopDato > forrigeF && meta.tungPalopDato <= r.forfallDato) {
         merknader.push({ termin: r.nr, dato: formatDato(r.forfallDato), tekst: `Tungt salær påløper ${formatDato(meta.tungPalopDato)}` });
       }
@@ -2150,8 +2203,7 @@ function renderAvdragsplan() {
 function redigerDato(idx) {
   const terminer = window._avdragsTerminer;
   const meta     = window._avdragsMeta;
-  // Ekstra-terminen er ikke redigerbar
-  if (idx >= terminer.length) return;
+  if (!terminer || !meta || idx >= terminer.length) return;
   const td = document.querySelectorAll('#avdrag-tabell tbody tr')[idx].cells[1];
   const gjeldende = new Date(terminer[idx].dato);
 
@@ -2202,9 +2254,9 @@ function autoFormatOgParse(val) {
 function redigerBelop(idx) {
   const terminer = window._avdragsTerminer;
   const meta     = window._avdragsMeta;
-  // Ekstra-terminen er ikke redigerbar
-  if (idx >= terminer.length) return;
+  if (!terminer || !meta || idx >= terminer.length) return;
   const rader    = beregnAvdragsPlan(terminer, meta);
+  if (!rader[idx]) { renderAvdragsplan(); return; }
   const td       = document.querySelectorAll('#avdrag-tabell tbody tr')[idx].cells[2];
   const gjeldende = rader[idx].betaling;
 
