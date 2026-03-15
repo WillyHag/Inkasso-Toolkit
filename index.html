@@ -509,23 +509,23 @@
 
       <!-- INNDATA -->
       <div class="panel">
-        <div class="panel-title">kravets bestanddeler</div>
+        <div class="panel-title">kravets poster</div>
 
         <div class="field">
-          <label>Hovedstol (kr)</label>
-          <input type="text" inputmode="decimal" id="f-hovedstol" placeholder="0" min="0" oninput="beregnForlik()">
+          <label>Hovedstol</label>
+          <input type="text" inputmode="decimal" id="f-hovedstol" placeholder="kr 0" min="0" oninput="beregnForlik()">
         </div>
         <div class="field">
-          <label>Inkassogebyr (kr)</label>
-          <input type="text" inputmode="decimal" id="f-gebyr" placeholder="0" min="0" oninput="beregnForlik()">
+          <label>Inkassogebyr/salær</label>
+          <input type="text" inputmode="decimal" id="f-gebyr" placeholder="kr 0" min="0" oninput="beregnForlik()">
         </div>
         <div class="field">
-          <label>Renter (kr)</label>
-          <input type="text" inputmode="decimal" id="f-renter" placeholder="0" min="0" oninput="beregnForlik()">
+          <label>Renter</label>
+          <input type="text" inputmode="decimal" id="f-renter" placeholder="kr 0" min="0" oninput="beregnForlik()">
         </div>
         <div class="field">
-          <label>Rettslige kostnader (kr)</label>
-          <input type="text" inputmode="decimal" id="f-rettslige" placeholder="0" min="0" oninput="beregnForlik()">
+          <label>Rettslige kostnader</label>
+          <input type="text" inputmode="decimal" id="f-rettslige" placeholder="kr 0" min="0" oninput="beregnForlik()">
         </div>
       </div>
 
@@ -538,7 +538,7 @@
           <div class="slider-wrap" style="margin-bottom:0;">
             <label>
               Total reduksjon av kravet
-              <span class="slider-value" id="sl-total-val">0%</span>
+              <span class="slider-value" id="sl-total-val" onclick="visPstInput('sl-total','sl-total-val',0,100,beregnTotalRabatt)" title="Klikk for å skrive inn prosent" style="cursor:pointer;">0%</span>
             </label>
             <input type="range" id="sl-total" min="0" max="100" value="0"
                    oninput="beregnTotalRabatt(this.value)">
@@ -552,7 +552,7 @@
         <div class="slider-wrap">
           <label>
             Rabatt på renter
-            <span class="slider-value" id="sl-renter-val">0%</span>
+            <span class="slider-value" id="sl-renter-val" onclick="visPstInput('sl-renter','sl-renter-val',0,100,v=>{document.getElementById('sl-renter-val').textContent=v+'%';document.getElementById('f-direkte').value='';beregnForlik()})" title="Klikk for å skrive inn prosent" style="cursor:pointer;">0%</span>
           </label>
           <input type="range" id="sl-renter" min="0" max="100" value="0"
                  oninput="document.getElementById('sl-renter-val').textContent=this.value+'%'; document.getElementById('f-direkte').value=''; beregnForlik()">
@@ -562,7 +562,7 @@
         <div class="slider-wrap">
           <label>
             Rabatt på salær
-            <span class="slider-value" id="sl-salar-val">0%</span>
+            <span class="slider-value" id="sl-salar-val" onclick="visPstInput('sl-salar','sl-salar-val',0,100,v=>{document.getElementById('sl-salar-val').textContent=v+'%';document.getElementById('f-direkte').value='';beregnForlik()})" title="Klikk for å skrive inn prosent" style="cursor:pointer;">0%</span>
           </label>
           <input type="range" id="sl-salar" min="0" max="100" value="0"
                  oninput="document.getElementById('sl-salar-val').textContent=this.value+'%'; document.getElementById('f-direkte').value=''; beregnForlik()">
@@ -572,7 +572,7 @@
         <div class="slider-wrap">
           <label>
             Rabatt på hovedstol
-            <span class="slider-value" id="sl-hoved-val">0%</span>
+            <span class="slider-value" id="sl-hoved-val" onclick="visPstInput('sl-hoved','sl-hoved-val',0,50,v=>{document.getElementById('sl-hoved-val').textContent=v+'%';document.getElementById('f-direkte').value='';beregnForlik()})" title="Klikk for å skrive inn prosent" style="cursor:pointer;">0%</span>
           </label>
           <input type="range" id="sl-hoved" min="0" max="50" value="0"
                  oninput="document.getElementById('sl-hoved-val').textContent=this.value+'%'; document.getElementById('f-direkte').value=''; beregnForlik()">
@@ -584,7 +584,7 @@
         </div>
 
         <div class="field">
-          <label>Eller skriv inn forliksbeløp direkte (kr)</label>
+          <label>Eller skriv inn forliksbeløp direkte</label>
           <input type="text" inputmode="decimal" id="f-direkte" placeholder="Overstyr med fast beløp…" min="0"
                  oninput="beregnForlikDirekte()">
         </div>
@@ -632,7 +632,7 @@
     <div class="grid">
 
       <div class="panel">
-        <div class="panel-title">kravets bestanddeler</div>
+        <div class="panel-title">kravets poster</div>
 
         <!-- Skyldnertype og MVA -->
         <div class="field-row">
@@ -654,8 +654,8 @@
 
         <div class="field-row">
           <div class="field">
-            <label>Hovedstol (kr)</label>
-            <input type="text" inputmode="decimal" id="a-hovedstol" placeholder="0" min="0" oninput="oppdaterSalar()">
+            <label>Hovedstol</label>
+            <input type="text" inputmode="decimal" id="a-hovedstol" placeholder="kr 0" min="0" oninput="oppdaterSalar()">
           </div>
           <div class="field">
             <label>Oppr. forfallsdato</label>
@@ -668,8 +668,8 @@
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:10px;">Inkassosalær (beregnet automatisk)</div>
           <div class="field-row" style="margin-bottom:0;">
             <div class="field" style="margin-bottom:0;">
-              <label>Lett salær (kr)</label>
-              <input type="text" inputmode="decimal" id="a-salar" placeholder="0" min="0" oninput="beregnAvdrag()"
+              <label>Lett salær</label>
+              <input type="text" inputmode="decimal" id="a-salar" placeholder="kr 0" min="0" oninput="beregnAvdrag()"
                      style="background:var(--white);font-weight:600;">
             </div>
             <div class="field" style="margin-bottom:0;">
@@ -687,8 +687,8 @@
             </div>
             <div class="field-row" style="margin-bottom:0;">
               <div class="field" style="margin-bottom:0;">
-                <label>Totalt salær (tungt) (kr) <span style="color:var(--high);font-size:11px;">● Påløpt</span></label>
-                <input type="text" inputmode="decimal" id="a-tung-salar" placeholder="0" min="0" oninput="beregnAvdrag()"
+                <label>Totalt salær (tungt) <span style="color:var(--high);font-size:11px;">● Påløpt</span></label>
+                <input type="text" inputmode="decimal" id="a-tung-salar" placeholder="kr 0" min="0" oninput="beregnAvdrag()"
                        style="background:var(--white);font-weight:600;">
               </div>
             </div>
@@ -708,8 +708,8 @@
         </div>
 
         <div class="field">
-          <label>Rettslige kostnader (kr)</label>
-          <input type="text" inputmode="decimal" id="a-rettslige" placeholder="0" min="0">
+          <label>Rettslige kostnader</label>
+          <input type="text" inputmode="decimal" id="a-rettslige" placeholder="kr 0" min="0">
         </div>
 
         <div style="border-top:1px solid var(--border); margin: 16px 0;"></div>
@@ -721,7 +721,7 @@
                    oninput="synkMndBelop('mnd')">
           </div>
           <div class="field">
-            <label>Månedlig beløp (kr)</label>
+            <label>Månedlig beløp</label>
             <input type="text" inputmode="decimal" id="a-mnd-belop" placeholder="beregnes automatisk" min="0"
                    oninput="synkMndBelop('belop')">
           </div>
@@ -774,6 +774,7 @@
 
     <div class="panel" id="avdrag-tabell-panel" style="display:none;">
       <div class="panel-title">avdragsplan</div>
+      <div id="avdrag-merknader" style="margin-bottom:12px;"></div>
       <table class="avdrag-table" id="avdrag-tabell"></table>
       <div class="btn-row">
         <button class="btn-primary" onclick="kopierAvdrag()">📋 Kopier avdragsplan</button>
@@ -792,8 +793,8 @@
         <div class="panel-title">renteberegning</div>
 
         <div class="field">
-          <label>Beløp det beregnes renter av (kr)</label>
-          <input type="text" inputmode="decimal" id="rn-hoved" placeholder="0" min="0" oninput="beregnRente()">
+          <label>Beløp det beregnes renter av</label>
+          <input type="text" inputmode="decimal" id="rn-hoved" placeholder="kr 0" min="0" oninput="beregnRente()">
         </div>
         <div class="field-row">
           <div class="field">
@@ -884,6 +885,10 @@ function parseKr(val) {
   return isNaN(n) ? 0 : n;
 }
 
+function tbl(n) {
+  return Number(n).toLocaleString('no-NO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 function pst(n, av) {
   if (!av) return '0%';
   return (n / av * 100).toFixed(1) + '%';
@@ -943,15 +948,35 @@ function triggerBeregning(input) {
 
 // Koble auto-format til alle datofelt ved oppstart
 document.addEventListener('DOMContentLoaded', () => {
+  // Dato-felt: formater på blur
   document.querySelectorAll('input[placeholder="dd.mm.åååå"]').forEach(input => {
-    // Formater og beregn når man forlater feltet
     input.addEventListener('blur', () => autoFormatDato(input));
-    // Beregn også hvis man taster Enter
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter') autoFormatDato(input);
     });
   });
+
+  // Beløps-felt: formater til "10 000,00" på blur
+  const belopIds = ['f-hovedstol','f-gebyr','f-renter','f-rettslige','f-direkte',
+                    'a-hovedstol','a-salar','a-tung-salar','a-rettslige','a-mnd-belop','rn-hoved'];
+  belopIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('blur', () => formatBelopFelt(el));
+    el.addEventListener('focus', () => {
+      // Ved fokus: vis rå tallverdi uten formatering så det er lett å redigere
+      const n = parseKr(el.value);
+      if (n) el.value = String(n).replace('.', ',');
+    });
+  });
 });
+
+function formatBelopFelt(input) {
+  const n = parseKr(input.value);
+  if (!n && n !== 0) return;
+  if (n === 0 && !input.value) return;
+  input.value = n.toLocaleString('no-NO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
 /* ════════════════════════════════
    FORLIK
@@ -978,6 +1003,56 @@ function kopierFallback(tekst, melding) {
   document.execCommand('copy');
   document.body.removeChild(el);
   alert(melding || 'Kopiert!');
+}
+
+function visPstInput(sliderId, valId, min, max, callback) {
+  const valEl = document.getElementById(valId);
+  const slider = document.getElementById(sliderId);
+  const current = parseInt(slider.value) || 0;
+
+  // Erstatt badge midlertidig med et lite input-felt
+  const inp = document.createElement('input');
+  inp.type = 'number';
+  inp.min = min;
+  inp.max = max;
+  inp.value = current;
+  inp.style.cssText = `width:56px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;
+    background:var(--ink);color:var(--accent);border:none;border-radius:4px;
+    padding:1px 6px;text-align:center;outline:none;`;
+
+  valEl.replaceWith(inp);
+  inp.focus();
+  inp.select();
+
+  function bekreft() {
+    let v = Math.min(max, Math.max(min, parseInt(inp.value) || 0));
+    slider.value = v;
+    // Gjenopprett badge
+    const span = document.createElement('span');
+    span.className = 'slider-value';
+    span.id = valId;
+    span.textContent = v + '%';
+    span.title = 'Klikk for å skrive inn prosent';
+    span.style.cursor = 'pointer';
+    span.onclick = () => visPstInput(sliderId, valId, min, max, callback);
+    inp.replaceWith(span);
+    callback(v);
+  }
+
+  inp.addEventListener('blur', bekreft);
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); bekreft(); }
+    if (e.key === 'Escape') {
+      const span = document.createElement('span');
+      span.className = 'slider-value';
+      span.id = valId;
+      span.textContent = current + '%';
+      span.title = 'Klikk for å skrive inn prosent';
+      span.style.cursor = 'pointer';
+      span.onclick = () => visPstInput(sliderId, valId, min, max, callback);
+      inp.replaceWith(span);
+    }
+  });
 }
 
 function nullstillTotalSlider() {
@@ -1111,6 +1186,8 @@ function beregnForlikDirekte() {
 }
 
 function visForlikResultat(v, total, forlik, sparer, nyHoved, nyGebyr, nyRenter, nyRettslig, hovedstolAvslag = 0) {
+  // Lagre beregnede verdier for bruk i kopierForlik
+  window._forlikData = { v, total, forlik, sparer, nyHoved, nyGebyr, nyRenter, nyRettslig };
   document.getElementById('r-forlik').textContent = kr(forlik);
   document.getElementById('r-forlik-sub').textContent = pst(forlik, total) + ' av totalkrav';
   document.getElementById('r-sparer').textContent = kr(Math.max(0, sparer));
@@ -1165,23 +1242,23 @@ function visForlikResultat(v, total, forlik, sparer, nyHoved, nyGebyr, nyRenter,
 }
 
 function kopierForlik() {
-  const v = getForlikInput();
-  const total = v.hoved + v.gebyr + v.renter + v.rettslig;
-  const forlik = parseFloat(document.getElementById('r-forlik').textContent.replace(/[^0-9]/g,'')) || 0;
-  const sparer = total - forlik;
+  const d = window._forlikData;
+  if (!d) { alert('Beregn forlik først.'); return; }
+
+  const { v, total, forlik, sparer, nyHoved, nyGebyr, nyRenter, nyRettslig } = d;
 
   const tekst =
     `FORLIKSFORSLAG\n` +
     `─────────────────────────\n` +
     `Totalkrav:       ${kr(total)}\n` +
     `Forliksbeløp:    ${kr(forlik)}\n` +
-    `Skyldner sparer: ${kr(sparer)} (${pst(sparer, total)})\n` +
+    `Reduksjon:       ${kr(Math.max(0, sparer))} (${pst(Math.max(0, sparer), total)})\n` +
     `─────────────────────────\n` +
-    `Bestanddeler:\n` +
-    (v.hoved    ? `  Hovedstol:            ${kr(v.hoved)}\n` : '') +
-    (v.gebyr    ? `  Inkassogebyr/salær:   ${kr(v.gebyr)}\n` : '') +
-    (v.renter   ? `  Renter:               ${kr(v.renter)}\n` : '') +
-    (v.rettslig ? `  Rettslige kostnader:  ${kr(v.rettslig)}\n` : '');
+    `Oversikt:\n` +
+    (v.renter   ? `  Renter:               ${kr(nyRenter ?? v.renter)}${nyRenter !== null && nyRenter < v.renter ? ` (av ${kr(v.renter)})` : ''}\n` : '') +
+    (v.gebyr    ? `  Inkassogebyr/salær:   ${kr(nyGebyr  ?? v.gebyr)} ${nyGebyr  !== null && nyGebyr  < v.gebyr  ? ` (av ${kr(v.gebyr)})` : ''}\n` : '') +
+    (v.rettslig ? `  Rettslige kostnader:  ${kr(nyRettslig ?? v.rettslig)}\n` : '') +
+    (v.hoved    ? `  Hovedstol:            ${kr(nyHoved  ?? v.hoved)} ${nyHoved  !== null && nyHoved  < v.hoved  ? ` (av ${kr(v.hoved)})` : ''}\n` : '');
 
   kopierTekst(tekst, 'Forliksforslag kopiert!');
 }
@@ -1635,6 +1712,7 @@ function beregnAvdrag() {
 
   let totalBetalt = 0;
   let totalRenterIAvtalen = 0;
+  let merknader = [];
 
   for (let i = 1; i <= mnd; i++) {
     const forfallDato = leggTilMnd(startDato, i - 1);
@@ -1708,22 +1786,35 @@ function beregnAvdrag() {
 
     html += `<tr>
       <td class="label">${i}</td>
-      <td>${formatDato(forfallDato)}</td>
-      <td><strong>${kr(betaling)}</strong></td>
-      <td style="color:var(--text-muted)">${tilSalar > 0 ? kr(tilSalar) : '–'}</td>
-      <td style="color:var(--text-muted)">${tilHovedstol > 0 ? kr(tilHovedstol) : '–'}</td>
-      <td style="color:var(--high)">${tilRenter > 0 ? kr(tilRenter) : '–'}</td>
-      <td style="border-left:2px solid var(--border);color:var(--text-muted)">${restSalar > 0 ? kr(restSalar) : '–'}</td>
-      <td style="color:var(--text-muted)">${restHovedstol > 0 ? kr(restHovedstol) : '–'}</td>
-      <td style="color:var(--high)">${kr(rentePaForfall)}</td>
-      <td><strong>${kr(restTotal)}</strong>${merknad ? `<br><span style="font-size:11px;color:#b45309;">${merknad}</span>` : ''}</td>
+      <td style="white-space:nowrap">${formatDato(forfallDato)}</td>
+      <td style="white-space:nowrap"><strong>${tbl(betaling)}</strong></td>
+      <td style="color:var(--text-muted);white-space:nowrap">${tilSalar > 0 ? tbl(tilSalar) : '–'}</td>
+      <td style="color:var(--text-muted);white-space:nowrap">${tilHovedstol > 0 ? tbl(tilHovedstol) : '–'}</td>
+      <td style="color:var(--high);white-space:nowrap">${tilRenter > 0 ? tbl(tilRenter) : '–'}</td>
+      <td style="border-left:2px solid var(--border);color:var(--text-muted);white-space:nowrap">${restSalar > 0 ? tbl(restSalar) : '–'}</td>
+      <td style="color:var(--text-muted);white-space:nowrap">${restHovedstol > 0 ? tbl(restHovedstol) : '–'}</td>
+      <td style="color:var(--high);white-space:nowrap">${tbl(rentePaForfall)}</td>
+      <td style="white-space:nowrap"><strong>${tbl(restTotal)}</strong></td>
     </tr>`;
+
+    if (merknad) merknader.push({ termin: i, dato: formatDato(forfallDato), tekst: merknad });
 
     forrigeDato = new Date(forfallDato);
   }
 
   html += '</tbody>';
   document.getElementById('avdrag-tabell').innerHTML = html;
+
+  // Vis merknader utenfor tabellen
+  const merknadEl = document.getElementById('avdrag-merknader');
+  if (merknadEl) {
+    merknadEl.innerHTML = merknader.map(m =>
+      `<div style="background:#fff8e1;border-left:3px solid #f59e0b;border-radius:6px;padding:8px 14px;margin-bottom:6px;font-size:13px;color:#92400e;">
+        ⚠ Termin ${m.termin} (${m.dato}): ${m.tekst}
+      </div>`
+    ).join('');
+  }
+
   document.getElementById('avdrag-tabell-panel').style.display = 'block';
 
   // Oppdater bokser og breakdown med avtale-totaler
@@ -1756,12 +1847,12 @@ function beregnAvdrag() {
 
 function kopierAvdrag() {
   const rows = document.querySelectorAll('#avdrag-tabell tbody tr');
-  let tekst = 'AVDRAGSPLAN\n' + '─'.repeat(60) + '\n';
-  tekst += `${'#'.padEnd(4)}${'Forfall'.padEnd(14)}${'Innbet.'.padEnd(12)}${'Salær'.padEnd(12)}${'Hovedstol'.padEnd(12)}${'Renter'.padEnd(12)}Rest\n`;
-  tekst += '─'.repeat(60) + '\n';
+  let tekst = 'AVDRAGSPLAN\n' + '─'.repeat(70) + '\n';
+  tekst += `${'#'.padEnd(4)}${'Forfall'.padEnd(14)}${'Innbet.'.padEnd(14)}${'Salær'.padEnd(14)}${'Hovedstol'.padEnd(14)}${'Renter'.padEnd(14)}${'Rest total'}\n`;
+  tekst += '─'.repeat(70) + '\n';
   rows.forEach(r => {
     const c = r.querySelectorAll('td');
-    tekst += `${c[0].textContent.padEnd(4)}${c[1].textContent.padEnd(14)}${c[2].textContent.replace(/\s+/g,' ').trim().padEnd(12)}${c[3].textContent.padEnd(12)}${c[4].textContent.padEnd(12)}${c[5].textContent.padEnd(12)}${c[6].textContent.split('\n')[0].trim()}\n`;
+    tekst += `${c[0].textContent.trim().padEnd(4)}${c[1].textContent.trim().padEnd(14)}${c[2].textContent.replace(/\s+/g,' ').trim().padEnd(14)}${c[3].textContent.trim().padEnd(14)}${c[4].textContent.trim().padEnd(14)}${c[5].textContent.trim().padEnd(14)}${c[9].textContent.trim()}\n`;
   });
   kopierTekst(tekst, 'Avdragsplan kopiert!');
 }
