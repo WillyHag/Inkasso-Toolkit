@@ -686,11 +686,19 @@
         <div class="slider-wrap">
           <label>
             Rabatt på hovedstol
-            <span class="slider-value" id="sl-hoved-val" onclick="visPstInput('sl-hoved','sl-hoved-val',0,50,v=>{document.getElementById('sl-hoved-val').textContent=v+'%';document.getElementById('f-direkte').value='';beregnForlik()})" title="Klikk for å skrive inn prosent" style="cursor:pointer;">0%</span>
+            <span class="slider-value" id="sl-hoved-val" onclick="visPstInput('sl-hoved','sl-hoved-val',0,parseInt(document.getElementById('sl-hoved').max),v=>{document.getElementById('sl-hoved-val').textContent=v+'%';document.getElementById('f-direkte').value='';beregnForlik()})" title="Klikk for å skrive inn prosent" style="cursor:pointer;">0%</span>
           </label>
           <input type="range" id="sl-hoved" min="0" max="50" value="0"
                  oninput="document.getElementById('sl-hoved-val').textContent=this.value+'%'; document.getElementById('f-direkte').value=''; beregnForlik()">
-          <div class="slider-marks"><span>0%</span><span>25%</span><span>50%</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+            <div class="slider-marks" style="margin-top:0;flex:1;" id="sl-hoved-marks"><span>0%</span><span>25%</span><span>50%</span></div>
+          </div>
+          <div style="text-align:right;margin-top:4px;">
+            <button id="sl-hoved-unlock" onclick="toggleHovedstolMaks()" title="Lås opp inntil 100% rabatt på hovedstol"
+                    style="font-size:11px;font-weight:600;color:var(--text-muted);background:var(--bg-dark);border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;">
+              🔓 Opp til 100%
+            </button>
+          </div>
         </div>
 
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
@@ -701,6 +709,16 @@
           <label>Eller skriv inn forliksbeløp direkte</label>
           <input type="text" inputmode="decimal" id="f-direkte" placeholder="Overstyr med fast beløp…" min="0"
                  oninput="beregnForlikDirekte()">
+        </div>
+
+        <!-- Proporsjonal fordeling -->
+        <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:14px;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
+            <input type="checkbox" id="f-proporsjonal" onchange="toggleProporsjonal()"
+                   style="width:16px;height:16px;cursor:pointer;accent-color:var(--ink);">
+            <span style="font-size:13px;font-weight:600;color:var(--ink);">Proporsjonal fordeling</span>
+            <span style="font-size:12px;color:var(--text-muted);">– rabatten fordeles likt på alle poster</span>
+          </label>
         </div>
       </div>
 
@@ -1084,7 +1102,7 @@ function lagreSaker(saker) {
 function samleSakData() {
   // Samler alle relevante feltverdier fra alle tre moduler
   const ids = [
-    'f-hovedstol','f-gebyr','f-renter','f-rettslige','f-direkte','f-kontonummer','f-kid',
+    'f-hovedstol','f-gebyr','f-renter','f-rettslige','f-direkte','f-tilbyr','f-kontonummer','f-kid',
     'sl-total','sl-renter','sl-salar','sl-hoved',
     'a-skyldner','a-mva','a-hovedstol','a-purregebyr','a-salar','a-rettslige',
     'a-forfall','a-iv-forfall','a-bo-dato','a-tung-salar','a-tung-salar-fremtidig',
@@ -1633,33 +1651,41 @@ function beregnTotalRabatt(pst) {
   const total = v.hoved + v.gebyr + v.renter + v.rettslig;
   if (!total) return;
 
-  // Rabattbeløp totalt (rettslige holdes utenfor)
-  const rabattKroner = total * (pst / 100);
+  const proporsjonal = document.getElementById('f-proporsjonal')?.checked;
 
-  // Fordel rabatten: renter først, deretter salær, eventuelt hovedstol
-  let rest = rabattKroner;
+  if (proporsjonal) {
+    // Proporsjonal: samme prosent på alle poster (rettslige alltid 0% rabatt)
+    const pstRenter = v.renter  > 0 ? pst : 0;
+    const pstSalar  = v.gebyr   > 0 ? pst : 0;
+    const pstHoved  = v.hoved   > 0 ? Math.min(pst, parseInt(document.getElementById('sl-hoved').max)) : 0;
 
-  // Rabatt på renter
-  const rabattRenter = Math.min(rest, v.renter);
-  rest -= rabattRenter;
-  const pstRenter = v.renter > 0 ? Math.round((rabattRenter / v.renter) * 100) : 0;
+    document.getElementById('sl-renter').value = pstRenter;
+    document.getElementById('sl-renter-val').textContent = pstRenter + '%';
+    document.getElementById('sl-salar').value = pstSalar;
+    document.getElementById('sl-salar-val').textContent = pstSalar + '%';
+    document.getElementById('sl-hoved').value = pstHoved;
+    document.getElementById('sl-hoved-val').textContent = pstHoved + '%';
+  } else {
+    // Standard: renter frafalles først, deretter salær, så evt. hovedstol
+    const rabattKroner = total * (pst / 100);
+    let rest = rabattKroner;
 
-  // Rabatt på salær
-  const rabattSalar = Math.min(rest, v.gebyr);
-  rest -= rabattSalar;
-  const pstSalar = v.gebyr > 0 ? Math.round((rabattSalar / v.gebyr) * 100) : 0;
+    const rabattRenter = Math.min(rest, v.renter); rest -= rabattRenter;
+    const pstRenter = v.renter > 0 ? Math.round((rabattRenter / v.renter) * 100) : 0;
 
-  // Rabatt på hovedstol (det som eventuelt gjenstår)
-  const rabattHoved = Math.min(rest, v.hoved);
-  const pstHoved = v.hoved > 0 ? Math.min(50, Math.round((rabattHoved / v.hoved) * 100)) : 0;
+    const rabattSalar = Math.min(rest, v.gebyr); rest -= rabattSalar;
+    const pstSalar = v.gebyr > 0 ? Math.round((rabattSalar / v.gebyr) * 100) : 0;
 
-  // Oppdater slidere
-  document.getElementById('sl-renter').value = pstRenter;
-  document.getElementById('sl-renter-val').textContent = pstRenter + '%';
-  document.getElementById('sl-salar').value = pstSalar;
-  document.getElementById('sl-salar-val').textContent = pstSalar + '%';
-  document.getElementById('sl-hoved').value = pstHoved;
-  document.getElementById('sl-hoved-val').textContent = pstHoved + '%';
+    const rabattHoved = Math.min(rest, v.hoved);
+    const pstHoved = v.hoved > 0 ? Math.min(parseInt(document.getElementById('sl-hoved').max), Math.round((rabattHoved / v.hoved) * 100)) : 0;
+
+    document.getElementById('sl-renter').value = pstRenter;
+    document.getElementById('sl-renter-val').textContent = pstRenter + '%';
+    document.getElementById('sl-salar').value = pstSalar;
+    document.getElementById('sl-salar-val').textContent = pstSalar + '%';
+    document.getElementById('sl-hoved').value = pstHoved;
+    document.getElementById('sl-hoved-val').textContent = pstHoved + '%';
+  }
 
   beregnForlik();
 }
@@ -1695,6 +1721,7 @@ function beregnForlik() {
 
   const forlik = nyHoved + nyGebyr + nyRenter + nyRettslig;
   const sparer = total - forlik;
+  const hovedstolAvslag = Math.max(0, v.hoved - nyHoved);
 
   // Oppdater total-slideren basert på faktisk rabatt
   if (total > 0) {
@@ -1703,7 +1730,7 @@ function beregnForlik() {
     document.getElementById('sl-total-val').textContent = totalPst + '%';
   }
 
-  visForlikResultat(v, total, forlik, sparer, nyHoved, nyGebyr, nyRenter, nyRettslig);
+  visForlikResultat(v, total, forlik, sparer, nyHoved, nyGebyr, nyRenter, nyRettslig, hovedstolAvslag);
 }
 
 function beregnForlikDirekte() {
@@ -1713,6 +1740,7 @@ function beregnForlikDirekte() {
   const v = getForlikInput();
   const total = v.hoved + v.gebyr + v.renter + v.rettslig;
   const sparer = total - direkte;
+  const proporsjonal = document.getElementById('f-proporsjonal')?.checked;
 
   // Nullstill slidere
   ['sl-salar','sl-renter','sl-hoved'].forEach(id => {
@@ -1720,24 +1748,42 @@ function beregnForlikDirekte() {
     document.getElementById(id + '-val').textContent = '0%';
   });
 
-  // Riktig logikk for direkte forliksbeløp:
-  // Forliksbeløpet skal primært gå til kreditors hovedstol.
-  // Renter og salær frafalles. Rettslige kostnader betales alltid.
-  // Advarsel hvis forliksbeløpet minus rettslige kostnader er lavere enn full hovedstol.
+  let nyHoved, nyGebyr, nyRenter, nyRettslig, hovedstolAvslag;
+  nyRettslig = v.rettslig; // alltid fullt
 
-  // Rettslige kostnader trekkes alltid
-  const nyRettslig = v.rettslig;
-  const tilHovedstol = direkte - v.rettslig;
+  if (proporsjonal) {
+    // Proporsjonal: fordel likt mellom renter, salær og hovedstol
+    const fordelbar = v.hoved + v.gebyr + v.renter;
+    const tilResterende = Math.max(0, direkte - v.rettslig);
+    const andel = fordelbar > 0 ? Math.min(tilResterende / fordelbar, 1) : 0;
+    nyRenter = Math.round(v.renter * andel * 100) / 100;
+    nyGebyr  = Math.round(v.gebyr  * andel * 100) / 100;
+    nyHoved  = Math.round(v.hoved  * andel * 100) / 100;
+    hovedstolAvslag = Math.max(0, v.hoved - nyHoved);
 
-  // Renter og salær frafalles
-  const nyRenter = 0;
-  const nyGebyr  = 0;
+    // Oppdater individuelle slidere med riktig prosent per post
+    const pstRenter = v.renter > 0 ? Math.round((1 - andel) * 100) : 0;
+    const pstSalar  = v.gebyr  > 0 ? Math.round((1 - andel) * 100) : 0;
+    const pstHoved  = v.hoved  > 0 ? Math.min(Math.round((1 - andel) * 100), parseInt(document.getElementById('sl-hoved').max)) : 0;
+    document.getElementById('sl-renter').value = pstRenter; document.getElementById('sl-renter-val').textContent = pstRenter + '%';
+    document.getElementById('sl-salar').value  = pstSalar;  document.getElementById('sl-salar-val').textContent  = pstSalar  + '%';
+    document.getElementById('sl-hoved').value  = pstHoved;  document.getElementById('sl-hoved-val').textContent  = pstHoved  + '%';
+  } else {
+    // Standard: rettslige alltid, renter og salær frafalles, evt. avslag på hoved
+    const tilHovedstol = direkte - v.rettslig;
+    nyRenter = 0;
+    nyGebyr  = 0;
+    nyHoved  = Math.max(0, Math.min(tilHovedstol, v.hoved));
+    hovedstolAvslag = Math.max(0, v.hoved - nyHoved);
 
-  // Hovedstol: det som gjenstår etter rettslige
-  const nyHoved = Math.max(0, Math.min(tilHovedstol, v.hoved));
-
-  // Advarsel hvis ikke full hovedstol dekkes
-  const hovedstolAvslag = Math.max(0, v.hoved - nyHoved);
+    // Oppdater individuelle slidere basert på faktisk reduksjon
+    const pstRenter = v.renter > 0 ? 100 : 0;
+    const pstSalar  = v.gebyr  > 0 ? 100 : 0;
+    const pstHoved  = v.hoved  > 0 ? Math.min(Math.round((1 - nyHoved / v.hoved) * 100), parseInt(document.getElementById('sl-hoved').max)) : 0;
+    document.getElementById('sl-renter').value = pstRenter; document.getElementById('sl-renter-val').textContent = pstRenter + '%';
+    document.getElementById('sl-salar').value  = pstSalar;  document.getElementById('sl-salar-val').textContent  = pstSalar  + '%';
+    document.getElementById('sl-hoved').value  = pstHoved;  document.getElementById('sl-hoved-val').textContent  = pstHoved  + '%';
+  }
 
   visForlikResultat(v, total, direkte, sparer, nyHoved, nyGebyr, nyRenter, nyRettslig, hovedstolAvslag);
 
@@ -1803,6 +1849,7 @@ function visForlikResultat(v, total, forlik, sparer, nyHoved, nyGebyr, nyRenter,
   </div>`;
 
   bd.innerHTML = html;
+
   autolagreSak();
 }
 
@@ -1868,8 +1915,56 @@ Med vennlig hilsen`;
 }
 
 
+function toggleHovedstolMaks() {
+  const slider  = document.getElementById('sl-hoved');
+  const btn     = document.getElementById('sl-hoved-unlock');
+  const marks   = document.getElementById('sl-hoved-marks');
+  const låstOpp = slider.max === '100';
+
+  if (låstOpp) {
+    slider.max = 50;
+    if (parseInt(slider.value) > 50) { slider.value = 50; document.getElementById('sl-hoved-val').textContent = '50%'; }
+    btn.textContent   = '🔓 Opp til 100%';
+    btn.style.color   = 'var(--text-muted)';
+    marks.innerHTML   = '<span>0%</span><span>25%</span><span>50%</span>';
+  } else {
+    slider.max = 100;
+    btn.textContent   = '🔒 Begrens til 50%';
+    btn.style.color   = 'var(--high)';
+    marks.innerHTML   = '<span>0%</span><span>50%</span><span>100%</span>';
+  }
+  beregnForlik();
+}
+
+function toggleProporsjonal() {
+  const aktiv = document.getElementById('f-proporsjonal').checked;
+  if (!aktiv) {
+  }
+  const pst = document.getElementById('sl-total').value;
+  if (parseInt(pst) > 0) {
+    beregnTotalRabatt(pst);
+  } else {
+    beregnForlik();
+  }
+}
+
+function _proporsjonalData() {
+  const hoved    = parseKr(document.getElementById('f-hovedstol').value) || 0;
+  const gebyr    = parseKr(document.getElementById('f-gebyr').value)     || 0;
+  const renter   = parseKr(document.getElementById('f-renter').value)    || 0;
+  const rettslig = parseKr(document.getElementById('f-rettslige').value) || 0;
+  const tilbyr   = parseKr(document.getElementById('f-direkte').value)   || 0;
+  const total    = hoved + gebyr + renter + rettslig;
+  const fordelbar = hoved + gebyr + renter;
+  return { hoved, gebyr, renter, rettslig, tilbyr, total, fordelbar };
+}
+
+function forhandsvisProporsjonal() {}  // ikke lenger i bruk
+function brukProporsjonal() {}         // ikke lenger i bruk
+
+
 function nullstillForlik() {
-  ['f-hovedstol','f-gebyr','f-renter','f-rettslige','f-direkte','f-kontonummer','f-kid'].forEach(id => {
+  ['f-hovedstol','f-gebyr','f-renter','f-rettslige','f-direkte','f-tilbyr','f-kontonummer','f-kid'].forEach(id => {
     document.getElementById(id).value = '';
   });
   ['sl-total','sl-salar','sl-renter','sl-hoved'].forEach(id => {
@@ -1882,6 +1977,10 @@ function nullstillForlik() {
   });
   document.getElementById('r-forlik-sub').textContent = '–';
   document.getElementById('r-sparer-pst').textContent = '0% av totalkrav';
+  const propChk = document.getElementById('f-proporsjonal'); if (propChk) propChk.checked = false;
+  const sl = document.getElementById('sl-hoved'); if (sl) sl.max = 50;
+  const btn = document.getElementById('sl-hoved-unlock'); if (btn) { btn.textContent = '🔓 Opp til 100%'; btn.style.color = 'var(--text-muted)'; }
+  const marks = document.getElementById('sl-hoved-marks'); if (marks) marks.innerHTML = '<span>0%</span><span>25%</span><span>50%</span>';
 }
 
 /* ════════════════════════════════
