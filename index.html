@@ -51,7 +51,7 @@
     </div>
 
     <!-- Liste over lagrede saker -->
-    <div id="saker-liste"></div>
+    <div style="margin-bottom:12px;"><input type="text" id="saker-sok" placeholder="Søk på navn eller referanse…" oninput="filtrerSaker()" style="width:100%;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:13px;border:1px solid var(--border);border-radius:7px;outline:none;background:var(--white);box-sizing:border-box;"></div><div style="display:flex;justify-content:flex-end;margin-bottom:8px;"><button onclick="slettAlleSaker()" style="background:none;border:none;color:var(--high);font-size:12px;cursor:pointer;font-weight:600;">Slett alle</button></div><div id="saker-liste"></div>
   </div>
 </div>
 
@@ -565,7 +565,7 @@
         <div class="field-row">
           <div class="field">
             <label>Fra dato</label>
-            <input type="text" id="rn-fra" placeholder="dd.mm.åååå">
+            <input type="text" id="rn-fra" placeholder="dd.mm.åååå" oninput="beregnRente()">
             <div class="dato-feilmelding" id="rn-fra-feil">Ugyldig dato</div>
           </div>
           <div class="field">
@@ -573,7 +573,7 @@
               Til dato
               <span onclick="settDagensDato()" style="font-size:11px;font-weight:700;color:var(--ink);background:var(--accent);padding:2px 8px;border-radius:4px;cursor:pointer;letter-spacing:0.05em;">i dag</span>
             </label>
-            <input type="text" id="rn-til" placeholder="dd.mm.åååå">
+            <input type="text" id="rn-til" placeholder="dd.mm.åååå" oninput="beregnRente()">
             <div class="dato-feilmelding" id="rn-til-feil">Ugyldig dato</div>
           </div>
         </div>
