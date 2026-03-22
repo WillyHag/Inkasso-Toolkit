@@ -748,3 +748,107 @@ button {
   text-decoration: none;
 }
 .skip-link:focus { top: 0; }
+
+
+/* ════════════════════════════════
+   SATSER-MODAL
+════════════════════════════════ */
+
+.satser-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.satser-kort {
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.satser-kort-tittel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.satser-kort-verdi {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 6px;
+}
+
+.satser-kort-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.satser-modal-tabell-wrapper {
+  overflow-x: auto;
+  margin-bottom: 8px;
+}
+
+.satser-salar-tabell {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.satser-salar-tabell th,
+.satser-salar-tabell td {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  text-align: right;
+}
+
+.satser-salar-tabell th:first-child,
+.satser-salar-tabell td:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+.satser-salar-tabell thead th {
+  background: var(--bg-dark);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.satser-salar-tabell tbody tr:hover {
+  background: var(--bg-dark);
+}
+
+.satser-kilder {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.satser-kilde-lenke {
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.satser-kilde-lenke::before {
+  content: '↗';
+  font-size: 11px;
+}
+
+.satser-kilde-lenke:hover {
+  text-decoration: underline;
+}
