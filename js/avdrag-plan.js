@@ -39,14 +39,17 @@ function beregnAvdragsPlan(terminer, meta) {
 
     const gjenstaar = saldoSalar + saldoRettslige + saldoHovedstol + saldoRenter;
 
-    // Terminbeløp: manuelt satt brukes direkte, ellers fastMndBelop
-    // Siste termin: aldri mer enn fastMndBelop (ekstra termin tar resten)
-    // Unntak: normal beregning uten manuelle beløp og siste termin = eksakt gjenstående
-    const harNoenManuelle = meta.manuellRedigering || terminer.some(t => t.belop !== null);
+    // Terminbeløp:
+    // 1. Manuelt satt beløp brukes direkte (capper til gjenstående)
+    // 2. Ingenting gjenstår → hopp over terminen (betaling = 0)
+    // 3. Siste planlagte termin tar alltid eksakt rest
+    // 4. Øvrige terminer: fastMndBelop (capper til gjenstående)
     let betaling;
-    if (terminer[i].belop !== null) {
-      betaling = terminer[i].belop;
-    } else if (!harNoenManuelle && erSiste) {
+    if (gjenstaar <= 0.005) {
+      betaling = 0;
+    } else if (terminer[i].belop !== null) {
+      betaling = Math.min(terminer[i].belop, Math.round(gjenstaar * 100) / 100);
+    } else if (erSiste) {
       betaling = Math.round(gjenstaar * 100) / 100;
     } else {
       betaling = Math.min(fastMndBelop, Math.round(gjenstaar * 100) / 100);
@@ -613,27 +616,6 @@ function kopierAvdrag() {
 }
 
 function nullstillAvdrag() {
-  // Bekreft før nullstilling – unngå utilsiktet tap av data
-  const bekreftEl = document.getElementById('nullstill-avdrag-bekreft');
-  if (bekreftEl) { bekreftEl.remove(); return; }
-
-  const div = document.createElement('div');
-  div.id = 'nullstill-avdrag-bekreft';
-  div.className = 'varsel varsel-advarsel';
-  div.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;';
-  div.innerHTML = `<span>⚠ Nullstille alle felt?</span>
-    <div style="display:flex;gap:8px;">
-      <button onclick="_nullstillAvdragBekreft()" style="background:var(--high);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;">Ja, nullstill</button>
-      <button onclick="document.getElementById('nullstill-avdrag-bekreft').remove()" style="background:var(--bg-dark);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">Avbryt</button>
-    </div>`;
-  const tabell = document.getElementById('avdrag-tabell-panel');
-  if (tabell) tabell.before(div);
-  else document.getElementById('avdrag-summary').before(div);
-}
-
-function _nullstillAvdragBekreft() {
-  const bekreftEl = document.getElementById('nullstill-avdrag-bekreft');
-  if (bekreftEl) bekreftEl.remove();
   window._avdragsTerminer = null;
   window._avdragsMeta = null;
   ['a-hovedstol','a-salar','a-rettslige','a-mnd','a-mnd-belop','a-dato','a-forfall','a-iv-forfall','a-bo-dato','a-tung-salar','a-tung-salar-fremtidig','a-salar-dato'].forEach(id => {
