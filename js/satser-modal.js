@@ -154,6 +154,13 @@ function apneSatserModal() {
   }
   document.getElementById('satser-modal-innhold').innerHTML = byggSatserModalInnhold();
   modal.style.display = 'flex';
+  // Sett bakgrunn på modal-boksen basert på aktivt tema
+  const boks = modal.querySelector('div');
+  if (boks) {
+    const mork = document.documentElement.getAttribute('data-theme') === 'dark';
+    boks.style.background = mork ? '#1a1d2e' : '#ffffff';
+    boks.style.color = mork ? '#e8ecf4' : '#1e1e2e';
+  }
   document.body.style.overflow = 'hidden';
 }
 
