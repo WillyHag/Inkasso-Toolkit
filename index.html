@@ -63,7 +63,7 @@
       📅 Avdragsplan
       <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;background:var(--accent);color:var(--ink);padding:1px 5px;border-radius:3px;margin-left:5px;">Kjerne</span>
     </button>
-    <button class="tab" onclick="switchTab('forlik')">⚖ Forlik</button>
+            <button class="tab" onclick="switchTab('forlik'); fyllFraAvdrag('forlik');">⚖ Forlik</button>
     <button class="tab" onclick="switchTab('verktoy')">🔧 Verktøy</button>
   </div>
 
@@ -72,6 +72,14 @@
   ══════════════════════════════ -->
   <div class="tab-content" id="tab-forlik">
     <div class="grid">
+            <!-- HURTIGVALG FORLIK -->
+      <div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:4px;">
+        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-right:4px;">Hurtigvalg:</span>
+        <button type="button" class="btn-secondary" style="font-size:12px;padding:6px 14px;" onclick="document.getElementById('sl-renter').value=100;document.getElementById('sl-renter-val').textContent='100%';document.getElementById('sl-salar').value=100;document.getElementById('sl-salar-val').textContent='100%';document.getElementById('sl-hoved').value=0;document.getElementById('sl-hoved-val').textContent='0%';beregnForlik();">Frafalle renter + salær</button>
+        <button type="button" class="btn-secondary" style="font-size:12px;padding:6px 14px;" onclick="document.getElementById('sl-renter').value=100;document.getElementById('sl-renter-val').textContent='100%';document.getElementById('sl-salar').value=0;document.getElementById('sl-salar-val').textContent='0%';document.getElementById('sl-hoved').value=0;document.getElementById('sl-hoved-val').textContent='0%';beregnForlik();">Frafalle renter</button>
+        <button type="button" class="btn-secondary" style="font-size:12px;padding:6px 14px;" onclick="document.getElementById('sl-renter').value=0;document.getElementById('sl-renter-val').textContent='0%';document.getElementById('sl-salar').value=100;document.getElementById('sl-salar-val').textContent='100%';document.getElementById('sl-hoved').value=0;document.getElementById('sl-hoved-val').textContent='0%';beregnForlik();">Frafalle salær</button>
+        <button type="button" class="btn-secondary" style="font-size:12px;padding:6px 14px;color:var(--high);" onclick="nullstillForlik();">↺ Nullstill</button>
+      </div>
 
       <!-- INNDATA -->
       <div class="panel">
@@ -232,6 +240,11 @@
   ══════════════════════════════ -->
   <div class="tab-content active" id="tab-avdrag">
     <div class="avdrag-layout">
+            <!-- SAKSNUMMER/NAVN-FELT ØVERST -->
+      <div style="grid-column:1/-1;display:flex;align-items:center;gap:12px;background:var(--white);border-radius:var(--radius);padding:14px 20px;box-shadow:var(--shadow);margin-bottom:0;border-left:3px solid var(--accent);">
+        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);white-space:nowrap;">Sak / referanse</span>
+        <input type="text" id="sak-referanse" placeholder="Saksnr., skyldners navn e.l.…" style="flex:1;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;border:1px solid var(--border);border-radius:7px;outline:none;background:var(--bg);color:var(--text);" oninput="if(document.getElementById('sak-navn'))document.getElementById('sak-navn').value=this.value;">
+      </div>
 
       <div class="panel">
         <div class="panel-title">kravets poster</div>
