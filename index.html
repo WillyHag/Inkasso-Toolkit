@@ -17,8 +17,13 @@
     <span class="header-sub" style="display:block;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:400;letter-spacing:0.08em;color:rgba(255,255,255,0.45);text-transform:none;margin-top:2px;">Avdragsplan • Forlik • Verktøy</span>
   </div>
   <div class="header-right">
-    <button id="theme-toggle" onclick="toggleTheme()" style="background:var(--bg-dark);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
-      🌙 Mørk modus
+    <button id="theme-toggle" onclick="toggleTheme()" title="Bytt mellom lys og mørk modus"
+      style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:8px;">
+      <span id="theme-toggle-label" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);"></span>
+      <span id="theme-toggle-track" style="position:relative;display:inline-block;width:44px;height:24px;border-radius:12px;transition:background 0.2s;flex-shrink:0;">
+        <span id="theme-toggle-thumb" style="position:absolute;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></span>
+      </span>
+    </button>
     </button>
     <button onclick="visSaker()" style="background:var(--accent);color:var(--ink);border:none;border-radius:6px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
       💾 Lagrede saker
