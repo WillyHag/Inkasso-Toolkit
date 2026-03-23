@@ -380,8 +380,8 @@ function beregnAvdrag() {
       const dager = dagMellom(forrige, forf);
       const sats  = dagligRenteForDato(forrige);
       // Renter kun på hovedstol og inkassosalær – ikke avdragsgebyr eller rettslige
-      const renteBase = sh + Math.max(0, Math.min(ss, salarNaa));
-      sRent += renteBase * sats * dager;
+      // Renter på hele ss – konsistent med beregnAvdragsPlan
+      sRent += (sh + ss) * sats * dager;
 
       const gjenstaar = ss + sr + sh + sRent;
       // Siste termin: ta eksakt rest – dette speiler beregnAvdragsPlan

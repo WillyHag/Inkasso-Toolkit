@@ -1,3 +1,5 @@
+const INKASSOSATS = 750; // Finanstilsynet – oppdater ved endring
+
 function beregnAvdragsgebyr() {
   const mva = document.getElementById('a-mva')?.value || 'nei';
   const grunnlag = INKASSOSATS * 1.5;
