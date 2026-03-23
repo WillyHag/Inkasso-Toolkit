@@ -615,25 +615,54 @@ function kopierAvdrag() {
   kopierTekst(tekst, 'Avdragsplan kopiert!');
 }
 
-function nullstillAvdrag() {   // Nullstiller kun manuelle plan-redigeringer (dato/beløp i tabellen)   // Skjemafelter (hovedstol, dato, salær etc.) beholdes   if (window._avdragsTerminer) {     window._avdragsTerminer.forEach(t => {       if (!t._originalDato) t._originalDato = t.dato;       t.belop = null;       t._manuellBelop = false;     });     if (window._avdragsMeta) window._avdragsMeta.manuellRedigering = false;     renderAvdragsplan();     toast('Manuelle plan-redigeringer er tilbakestilt', 'ok', 2000);   } else {     toast('Ingen plan å tilbakestille', 'info', 2000);   } } function nullstillSkjema() {   // Nullstiller ALLE skjemafelter og plandata   window._avdragsTerminer = null;   window._avdragsMeta = null;   ['a-hovedstol','a-purregebyr','a-salar','a-rettslige','a-mnd','a-mnd-belop','a-dato','a-forfall','a-iv-forfall','a-bo-dato','a-tung-salar','a-tung-salar-fremtidig','a-salar-dato','sak-referanse'].forEach(id => {     const el = document.getElementById(id);     if (el) el.value = '';   });   const slAvd = document.getElementById('sl-avdragssalar');   if(slAvd){slAvd.value=100;}   const slAvdVal = document.getElementById('sl-avdragssalar-val');   if(slAvdVal){slAvdVal.textContent='100%';}   const skyldnerEl = document.getElementById('a-skyldner');   if(skyldnerEl) skyldnerEl.value = 'forbruker';   const mvaEl = document.getElementById('a-mva');   if(mvaEl) mvaEl.value = 'ja';   const dekningEl = document.getElementById('a-dekning');   if(dekningEl) dekningEl.value = 'SHR';   const frekvensEl = document.querySelectorAll('.freq-btn');   frekvensEl.forEach(b => b.classList.toggle('active', b.dataset.freq === 'monthly'));   document.getElementById('a-bo-ikke-sendt').checked = false;   const boDatoEl = document.getElementById('a-bo-dato');   if(boDatoEl){boDatoEl.disabled = false; boDatoEl.style.opacity = '1';}   // Skjul/nullstill kondisjonelle UI-elementer   const elemToHide = ['avdragssalar-varsel','tung-salar-wrap','tung-salar-fremtidig','iv-ikke-forfalt-varsel','foer-bo-varsel'];   elemToHide.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });   const inkassoWrap = document.getElementById('inkasso-salar-wrap');   if(inkassoWrap) inkassoWrap.style.display = 'block';   document.getElementById('avdrag-summary').innerHTML = '&lt;p&gt;Fyll inn bestanddeler og datoer for å beregne totalbeløp.&lt;/p&gt;';   document.getElementById('avdrag-tabell-panel').style.display = 'none';   oppdaterSalar();   toast('Skjemaet er nullstilt', 'ok', 2000); } // nullstillAvdrag_legacy() removed – use nullstillSkjema() instead function nullstillAvdrag_legacy() {
+function nullstillAvdrag() {
+  // Nullstiller kun manuelle plan-redigeringer (dato/beløp i tabellen)
+  // Skjemafelter (hovedstol, dato, salær etc.) beholdes
+  if (window._avdragsTerminer) {
+    window._avdragsTerminer.forEach(t => {
+      t.belop = null;
+      t._manuellBelop = false;
+    });
+    if (window._avdragsMeta) window._avdragsMeta.manuellRedigering = false;
+    renderAvdragsplan();
+    toast('Manuelle plan-redigeringer er tilbakestilt', 'ok', 2000);
+  } else {
+    toast('Ingen plan å tilbakestille', 'info', 2000);
+  }
+}
+
+function nullstillSkjema() {
   window._avdragsTerminer = null;
   window._avdragsMeta = null;
-  ['a-hovedstol','a-salar','a-rettslige','a-mnd','a-mnd-belop','a-dato','a-forfall','a-iv-forfall','a-bo-dato','a-tung-salar','a-tung-salar-fremtidig','a-salar-dato'].forEach(id => {
+  ['a-hovedstol','a-purregebyr','a-salar','a-rettslige','a-mnd','a-mnd-belop',
+   'a-dato','a-forfall','a-iv-forfall','a-bo-dato','a-tung-salar',
+   'a-tung-salar-fremtidig','a-salar-dato','sak-referanse'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
-  const slAvd = document.getElementById('sl-avdragssalar'); if(slAvd){slAvd.value=100;}
-  const slAvdVal = document.getElementById('sl-avdragssalar-val'); if(slAvdVal){slAvdVal.textContent='100%';}
-  document.getElementById('a-bo-ikke-sendt').checked        = false;
+  const slAvd = document.getElementById('sl-avdragssalar');
+  if (slAvd) slAvd.value = 100;
+  const slAvdVal = document.getElementById('sl-avdragssalar-val');
+  if (slAvdVal) slAvdVal.textContent = '100%';
+  const skyldnerEl = document.getElementById('a-skyldner');
+  if (skyldnerEl) skyldnerEl.value = 'forbruker';
+  const mvaEl = document.getElementById('a-mva');
+  if (mvaEl) mvaEl.value = 'ja';
+  const dekningEl = document.getElementById('a-dekning');
+  if (dekningEl) dekningEl.value = 'SHR';
+  document.getElementById('a-bo-ikke-sendt').checked = false;
   const boDatoEl = document.getElementById('a-bo-dato');
-  boDatoEl.disabled = false; boDatoEl.style.opacity = '1';
-  document.getElementById('avdragssalar-varsel').style.display  = 'none';
-  document.getElementById('tung-salar-wrap').style.display      = 'none';
-  document.getElementById('tung-salar-fremtidig').style.display = 'none';
-  document.getElementById('iv-ikke-forfalt-varsel').style.display = 'none';
-  document.getElementById('inkasso-salar-wrap').style.display      = 'block';
-  document.getElementById('foer-bo-varsel').style.display       = 'none';
+  if (boDatoEl) { boDatoEl.disabled = false; boDatoEl.style.opacity = '1'; }
+  ['avdragssalar-varsel','tung-salar-wrap','tung-salar-fremtidig',
+   'iv-ikke-forfalt-varsel','foer-bo-varsel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const inkassoWrap = document.getElementById('inkasso-salar-wrap');
+  if (inkassoWrap) inkassoWrap.style.display = 'block';
   document.getElementById('avdrag-summary').innerHTML =
     '<span style="color:var(--text-muted)">Fyll inn bestanddeler og datoer for å beregne totalbeløp.</span>';
   document.getElementById('avdrag-tabell-panel').style.display = 'none';
+  oppdaterSalar();
+  toast('Skjemaet er nullstilt', 'ok', 2000);
 }
