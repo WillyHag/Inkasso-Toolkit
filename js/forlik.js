@@ -493,4 +493,3 @@ function _nullstillForlikBekreft() {
 // Avdragssalær = 1,5 × inkassosatsen
 // Kreditor med fradragsrett: 1,5 × 750 = 1 125
 // Kreditor uten fradragsrett: (1,5 × 750) + 25% MVA = 1 406,25
-const INKASSOSATS = 750; // Finanstilsynet – oppdater ved endring
