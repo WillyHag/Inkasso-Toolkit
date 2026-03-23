@@ -447,7 +447,7 @@ function lastNedAvdragPDF() {
   // Dekomponering i én linje
   let delTekst = `Hovedstol ${kr(meta.startSaldoHovedstol)}`;
   if (meta.startSaldoSalar > 0)       delTekst += `  +  Salær ${kr(meta.startSaldoSalar)}`;
-  if (meta.startSaldoRettslige > 0)   delTekst += `  +  Rettslige ${kr(meta.startSaldoRettslige)}`;
+  if (meta.startSaldoRettslige > 0)   delTekst += `  +  Purregebyr/inkassogebyr ${kr(meta.startSaldoRettslige)}`;
   if (meta.startSaldoRenter > 0)      delTekst += `  +  Renter ${kr(meta.startSaldoRenter)}`;
   linje(delTekst, marg + 4, y + 13, 7, false, [100,110,130]);
 
@@ -458,11 +458,10 @@ function lastNedAvdragPDF() {
   hLinje(y); y += 4;
 
   const detaljeRader = [
-    ['Totalt skyldbeløp ved start', kr(åpningsbalanse)],
     ['Beløp per termin',            kr(førsteTermin)],
     ['Antall terminer',             String(rader.length)],
     ['Renter i avtaleperioden',     kr(totalRenter)],
-    ['Totalt betalt i avtalen',     kr(totalBetalt)],
+  
   ];
 
   detaljeRader.forEach(([label, val], idx) => {
