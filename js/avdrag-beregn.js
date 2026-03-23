@@ -385,12 +385,10 @@ function beregnAvdrag() {
 
       const gjenstaar = ss + sr + sh + sRent;
       // IV ikke forfalt: termin 1 er alltid 25% (fast), øvrige bruker prøveBelop
-      // Siste termin: ta eksakt rest
+              // Alle terminer bruker samme beløp – inkl. siste (like store avdrag)
       let bet;
       if (ivIkkeForfaltFoerBO && i === 0) {
         bet = Math.min(Math.ceil(totalVedForfall * 0.25 * 100) / 100, gjenstaar);
-      } else if (i === antMnd - 1) {
-        bet = Math.round(gjenstaar * 100) / 100;
       } else {
         bet = Math.min(prøveBelop, gjenstaar);
       }
