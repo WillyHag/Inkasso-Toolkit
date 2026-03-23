@@ -41,8 +41,9 @@ const SALAR_TABELL = [
   { til: null,   fja: [5400, 10800],   fnei: [6750, 13500],      nja: [8100, 16200],      nnei: [10125, 20250]   },
 ];
 
-function kr(n) {
-  return 'kr\u00a0' + n.toLocaleString('nb-NO', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+// Lokal kr-formatering for satser-modal (minimumFractionDigits: 0 passer tabellen bedre)
+function krSatser(n) {
+  return 'kr ' + n.toLocaleString('nb-NO', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
 
 function byggSalarTabell() {
@@ -50,14 +51,14 @@ function byggSalarTabell() {
     const grense = r.til ? 'opp til kr\u00a0' + r.til.toLocaleString('nb-NO') : 'over kr\u00a0250\u00a0000';
     return `<tr>
       <td>${grense}</td>
-      <td>${kr(r.fja[0])}</td>
-      <td>${kr(r.fja[1])}</td>
-      <td>${kr(r.fnei[0])}</td>
-      <td>${kr(r.fnei[1])}</td>
-      <td>${kr(r.nja[0])}</td>
-      <td>${kr(r.nja[1])}</td>
-      <td>${kr(r.nnei[0])}</td>
-      <td>${kr(r.nnei[1])}</td>
+      <td>${krSatser(r.fja[0])}</td>
+      <td>${krSatser(r.fja[1])}</td>
+      <td>${krSatser(r.fnei[0])}</td>
+      <td>${krSatser(r.fnei[1])}</td>
+      <td>${krSatser(r.nja[0])}</td>
+      <td>${krSatser(r.nja[1])}</td>
+      <td>${krSatser(r.nnei[0])}</td>
+      <td>${krSatser(r.nnei[1])}</td>
     </tr>`;
   }).join('');
 
@@ -96,7 +97,7 @@ function byggSatserModalInnhold() {
 
     <div class="satser-kort">
       <div class="satser-kort-tittel">Inkassosats ${s.aar}</div>
-      <div class="satser-kort-verdi">${kr(s.inkassosats)}</div>
+      <div class="satser-kort-verdi">${krSatser(s.inkassosats)}</div>
       <div class="satser-kort-note">Grunnlag for beregning av salær og avdragssalær. Justeres årlig fra 2027 (KPI).</div>
     </div>
 
@@ -108,32 +109,32 @@ function byggSatserModalInnhold() {
 
     <div class="satser-kort">
       <div class="satser-kort-tittel">Purregebyr</div>
-      <div class="satser-kort-verdi">${kr(s.purregebyr)}</div>
+      <div class="satser-kort-verdi">${krSatser(s.purregebyr)}</div>
       <div class="satser-kort-note">${s.purregebyrMaks}</div>
     </div>
 
     <div class="satser-kort">
       <div class="satser-kort-tittel">Standardkompensasjon (EU-gebyr)</div>
-      <div class="satser-kort-verdi">${kr(s.euGebyr)}</div>
+      <div class="satser-kort-verdi">${krSatser(s.euGebyr)}</div>
       <div class="satser-kort-note">${s.euGebyrNote}</div>
     </div>
 
     <div class="satser-kort">
       <div class="satser-kort-tittel">Avdragssalær</div>
-      <div class="satser-kort-verdi">${kr(s.avdragssalar)}</div>
+      <div class="satser-kort-verdi">${krSatser(s.avdragssalar)}</div>
       <div class="satser-kort-note">${s.avdragssalarNote}</div>
     </div>
 
     <div class="satser-kort">
       <div class="satser-kort-tittel">Skrivesalær</div>
-      <div class="satser-kort-verdi">${kr(s.skrivesalar)}</div>
+      <div class="satser-kort-verdi">${krSatser(s.skrivesalar)}</div>
       <div class="satser-kort-note">${s.skrivesalarNote}</div>
     </div>
 
     <div class="satser-kort">
       <div class="satser-kort-tittel">Rettsgebyr (1R)</div>
-      <div class="satser-kort-verdi">${kr(s.rettsgebyr)}</div>
-      <div class="satser-kort-note">Forliksråd: ${kr(s.rettsgebyrForliksrad)} (1,54R) &mdash; Utlegg namsmann: ${kr(s.rettsgebyrUtlegg)} (0,69R)</div>
+      <div class="satser-kort-verdi">${krSatser(s.rettsgebyr)}</div>
+      <div class="satser-kort-note">Forliksråd: ${krSatser(s.rettsgebyrForliksrad)} (1,54R) &mdash; Utlegg namsmann: ${krSatser(s.rettsgebyrUtlegg)} (0,69R)</div>
     </div>
 
   </div>
