@@ -149,7 +149,7 @@ function beregnAvdrag() {
   const ivForfalt = ivForfallDato && ivForfallDato < iDag;
   const ivIkkeForfaltFoerBO = foerBOTidlig && ivForfallDato && ivForfallDato >= iDag;
   const boIkkeSendt = boIkkeSendtTidlig;
-  const foerBO    = boIkkeSendt && ivForfalt;
+  const foerBO    = boIkkeSendt;
   const foerBOVarsel = document.getElementById('foer-bo-varsel');
   const foerBOTekst  = document.getElementById('foer-bo-varsel-tekst');
 
@@ -281,7 +281,7 @@ function beregnAvdrag() {
       }
     } else {
       const minFoerste = totalVedForfall * 0.25;
-      foerBOMsg = `ℹ️ <strong>IV forfalt, BO ikke sendt:</strong>`;
+      foerBOMsg = `⚠ <strong>IV forfalt, BO ikke sendt:</strong> Maks 4 avdrag. Første avdrag ≥ <strong>${kr(minFoerste)}</strong> (25% av ${kr(totalVedForfall)}).`;
       if (salarDato) foerBOMsg += ` Lett salær påføres <strong>${formatDato(salarDato)}</strong>. Husk saksnotat.`;
       else foerBOMsg += ` Husk å angi dato for lett salær og dokumentere i saksnotat.`;
     }
