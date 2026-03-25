@@ -281,7 +281,7 @@ function beregnAvdrag() {
       }
     } else {
       const minFoerste = totalVedForfall * 0.25;
-      foerBOMsg = `⚠ <strong>IV forfalt, BO ikke sendt:</strong> Maks 4 avdrag. Første avdrag ≥ <strong>${kr(minFoerste)}</strong> (25% av ${kr(totalVedForfall)}).`;
+      foerBOMsg = `ℹ️ <strong>IV forfalt, BO ikke sendt:</strong>`;
       if (salarDato) foerBOMsg += ` Lett salær påføres <strong>${formatDato(salarDato)}</strong>. Husk saksnotat.`;
       else foerBOMsg += ` Husk å angi dato for lett salær og dokumentere i saksnotat.`;
     }
