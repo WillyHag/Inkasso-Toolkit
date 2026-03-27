@@ -18,7 +18,8 @@ function beregnAvdrag() {
   const iDag = new Date(); iDag.setHours(0,0,0,0);
   const boDato       = parseNO(boStr);
   const forfDato     = parseNO(forfallStr);           // fakturadato – brukes til renteberegning
-  const ivForfallDato = parseNO(ivForfallStr) || forfDato; // IV-forfall – brukes til foerBO-logikk
+  const ivForfallDato     = parseNO(ivForfallStr) || forfDato; // IV-forfall – brukes til renteberegning
+  const ivForfallDatoSatt = parseNO(ivForfallStr);             // IV-forfall – kun når faktisk fylt inn
 
   // ── Tungt salær: automatisk basert på BO ──
   let tungPalopDato   = null;
@@ -146,8 +147,8 @@ function beregnAvdrag() {
   }
 
   // ── Avdragsavtale før BO: begrens til maks 4 avdrag, krev 25% første avdrag ──
-  const ivForfalt = ivForfallDato && ivForfallDato < iDag;
-  const ivIkkeForfaltFoerBO = foerBOTidlig && ivForfallDato && ivForfallDato >= iDag;
+  const ivForfalt = ivForfallDatoSatt && ivForfallDatoSatt < iDag;
+  const ivIkkeForfaltFoerBO = foerBOTidlig && ivForfallDatoSatt && ivForfallDatoSatt >= iDag;
   const boIkkeSendt = boIkkeSendtTidlig;
   const foerBO    = boIkkeSendt;
   const foerBOVarsel = document.getElementById('foer-bo-varsel');
@@ -251,7 +252,7 @@ function beregnAvdrag() {
   })();
 
   // Scenario: IV ikke forfalt og BO ikke sendt → første forfall = forfallsdato på IV
-  if (ivIkkeForfaltFoerBO && ivForfallDato) startDato = new Date(ivForfallDato);
+  if (ivIkkeForfaltFoerBO && ivForfallDatoSatt) startDato = new Date(ivForfallDatoSatt);
 
   // ── Renter fra i dag til første forfall – separat for hovedstol og salær ──
   const dagerTilForfall = dagMellom(iDag, startDato);
@@ -277,7 +278,7 @@ function beregnAvdrag() {
         foerBOMsg = `⚠ <strong>Kravet er under kr 2 500</strong> – det skal ikke inngås avdragsavtale. Skyldner betaler innen fristen i inkassovarselet.`;
       } else {
         const minFoerste = totalVedForfall * 0.25;
-        foerBOMsg = `⚠ <strong>IV ikke forfalt:</strong> 25% (${kr(minFoerste)}) betales innen <strong>${ivForfallDato ? formatDato(ivForfallDato) : '–'}</strong>. Restbeløp deles i 3 månedlige avdrag (totalt 4 terminer). Ingen salær legges på.`;
+        foerBOMsg = `⚠ <strong>IV ikke forfalt:</strong> 25% (${kr(minFoerste)}) betales innen <strong>${ivForfallDatoSatt ? formatDato(ivForfallDatoSatt) : '–'}</strong>. Restbeløp deles i 3 månedlige avdrag (totalt 4 terminer). Ingen salær legges på.`;
       }
     } else {
       const minFoerste = totalVedForfall * 0.25;
@@ -461,8 +462,8 @@ function beregnAvdrag() {
   const foersteBelop = ivIkkeForfaltFoerBO
     ? Math.ceil(totalVedForfall * 0.25 * 100) / 100
     : null;
-  const andreDato = ivIkkeForfaltFoerBO && ivForfallDato
-    ? leggTilMnd(ivForfallDato, 1)
+  const andreDato = ivIkkeForfaltFoerBO && ivForfallDatoSatt
+    ? leggTilMnd(ivForfallDatoSatt, 1)
     : null;
 
   window._avdragsTerminer = [];
@@ -472,7 +473,7 @@ function beregnAvdrag() {
     if (ivIkkeForfaltFoerBO) {
       if (i === 0) {
         // Termin 1: IV-forfallsdato, 25% automatisk (men kan overstyres)
-        dato   = new Date(ivForfallDato);
+        dato   = new Date(ivForfallDatoSatt);
         belop  = gammel?._manuellBelop ? gammel.belop : foersteBelop;
         manuell = gammel?._manuellBelop || false;
       } else {
