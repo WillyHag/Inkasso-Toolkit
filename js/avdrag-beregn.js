@@ -18,8 +18,8 @@ function beregnAvdrag() {
   const iDag = new Date(); iDag.setHours(0,0,0,0);
   const boDato       = parseNO(boStr);
   const forfDato     = parseNO(forfallStr);           // fakturadato – brukes til renteberegning
-  const ivForfallDato     = parseNO(ivForfallStr) || forfDato; // IV-forfall – brukes til renteberegning
-  const ivForfallDatoSatt = parseNO(ivForfallStr);             // IV-forfall – kun når faktisk fylt inn
+  const ivForfallDato     = parseNO(ivForfallStr) || forfDato; // med fallback – for renteberegning
+  const ivForfallDatoSatt = parseNO(ivForfallStr);             // uten fallback – for panel-logikk
 
   // ── Tungt salær: automatisk basert på BO ──
   let tungPalopDato   = null;

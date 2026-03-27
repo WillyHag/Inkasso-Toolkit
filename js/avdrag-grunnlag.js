@@ -222,12 +222,12 @@ function validerPurregebyr() {
 function oppdaterFoerBO() {
   const forfDato      = parseNO(document.getElementById('a-forfall').value.trim());
   const ivForfallStr  = document.getElementById('a-iv-forfall').value.trim();
-  // Bruk KUN IV-forfallsdato – ikke fall tilbake på fakturadato
-  // Panelene skal kun vises når saksbehandler har fylt inn IV-forfallsdato
-  const ivForfallDato = parseNO(ivForfallStr);
-  const boDato        = parseNO(document.getElementById('a-bo-dato').value.trim());
-  const iDag          = new Date(); iDag.setHours(0,0,0,0);
-  const boIkkeSendt   = document.getElementById('a-bo-ikke-sendt').checked;
+  const ivForfallDato = parseNO(ivForfallStr); // Ingen fallback – kun når faktisk fylt inn
+  const boDato       = parseNO(document.getElementById('a-bo-dato').value.trim());
+  const iDag         = new Date(); iDag.setHours(0,0,0,0);
+  const boIkkeSendt  = document.getElementById('a-bo-ikke-sendt').checked;
+
+  // Valideringen av IV-forfallsdato skjer i autoFormatDato
 
   const panel = document.getElementById('foer-bo-panel');
   if (!panel) { beregnAvdrag(); return; }
@@ -235,15 +235,15 @@ function oppdaterFoerBO() {
   if (boIkkeSendt) {
     panel.style.display = 'block';
 
-    const ivForfalt    = ivForfallDato && ivForfallDato <= iDag;
-    const ivIkkeSatt   = !ivForfallDato;
+    const ivForfalt  = ivForfallDato && ivForfallDato <= iDag;
+    const ivIkkeSatt = !ivForfallDato;
 
     // Vis ingenting før IV-forfallsdato er fylt inn
     document.getElementById('foer-bo-iv-ikke-forfalt').style.display = (!ivIkkeSatt && !ivForfalt) ? 'block' : 'none';
     document.getElementById('foer-bo-iv-forfalt').style.display      = ivForfalt ? 'block' : 'none';
     document.getElementById('foer-bo-salar-dato-wrap').style.display = ivForfalt ? 'block' : 'none';
 
-    // Scenario: IV ikke forfalt – vis under/over 2500-panel kun når IV-dato er satt
+    // Vis under/over 2500-panel kun når IV-dato er satt og ikke forfalt
     if (!ivIkkeSatt && !ivForfalt) {
       const hovedstol = parseKr(document.getElementById('a-hovedstol').value) || 0;
       const under2500 = document.getElementById('foer-bo-under-2500');
