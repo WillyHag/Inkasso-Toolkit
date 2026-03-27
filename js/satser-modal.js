@@ -22,8 +22,9 @@ const SATSER_INFO = {
   rettsgebyrUtlegg: 928,
   kilder: [
     { tekst: 'Finanstilsynet – Inkassosatsen 2026', url: 'https://www.finanstilsynet.no/nyhetsarkiv/nyheter/2026/inkassosatsen-i-2026-blir-750-kroner/' },
-    { tekst: 'Finanstilsynet – Forsinkelsesrente og standardkompensasjon', url: 'https://www.finanstilsynet.no/nyhetsarkiv/nyheter/2025/forsinkelsesrente-og-standardkompensasjon-for-inndrivelseskostnader-fra-1-januar-2026/' },
-    { tekst: 'Regjeringen – Forsinkelsesrente og standardkompensasjon', url: 'https://www.regjeringen.no/no/tema/okonomi-og-budsjett/renter/forsinkelsesrente-/id429404/' },
+    { tekst: 'Finanstilsynet – Forsinkelsesrente og standardkompensasjon', url: 'https://www.finanstilsynet.no/analyser-og-statistikk/forsinkelsesrente-og-standardkompensasjon/forsinkelsesrente/' },
+    { tekst: 'Finanstilsynet – Oversikt over utenrettslige inndrivingskostnader', url: 'https://www.finanstilsynet.no/forbrukerinformasjon/inkassovirksomhet/oversikt-over-utenrettslige-inndrivingskostnader/' },
+    { tekst: 'Finanstilsynet – Inkassovirksomhet', url: 'https://www.finanstilsynet.no/forbrukerinformasjon/inkassovirksomhet/' },
     { tekst: 'Inkassoloven (lovdata.no)', url: 'https://lovdata.no/dokument/NL/lov/1988-05-13-26' },
     { tekst: 'Inkassoforskriften (lovdata.no)', url: 'https://lovdata.no/dokument/SF/forskrift/1989-07-14-562' },
     { tekst: 'Forsinkelsesrenteloven (lovdata.no)', url: 'https://lovdata.no/dokument/NL/lov/1976-12-17-100' },
